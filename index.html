@@ -38,6 +38,26 @@
             <button onclick="logoutUser()" class="bg-red-50 text-red-600 border border-red-200 text-sm py-2 px-4 rounded hover:bg-red-100 transition">Sign Out</button>
         </header>
 
+        <!-- KPI SUMMARY METRICS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-blue-600">
+                <p class="text-xs font-semibold uppercase text-slate-500">Total Inventory Items</p>
+                <h3 id="kpi-total" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-emerald-600">
+                <p class="text-xs font-semibold uppercase text-slate-500">In Warehouse</p>
+                <h3 id="kpi-warehouse" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-amber-500">
+                <p class="text-xs font-semibold uppercase text-slate-500">In Transit</p>
+                <h3 id="kpi-transit" class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-purple-600">
+                <p class="text-xs font-semibold uppercase text-slate-500">Rental / Maintenance</p>
+                <h3 id="kpi-active" class="text-2xl font-bold text-purple-600 mt-1">0</h3>
+            </div>
+        </div>
+
         <!-- USER MANAGEMENT SECTION (Protected: Only visible to Managers & Superadmins) -->
         <div id="user-management-section" class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-6 hidden">
             <h2 class="text-xl font-semibold mb-4 text-slate-700">User Management (Manager & Superadmin Only)</h2>
@@ -55,7 +75,6 @@
                     <select id="signupRole" class="w-full rounded-md border-slate-300 border p-2 text-sm">
                         <option value="admin">Admin</option>
                         <option value="manager">Manager</option>
-                        <!-- Superadmin option added dynamically below only for Superadmins -->
                     </select>
                 </div>
                 <button type="submit" class="bg-emerald-600 text-white text-sm py-2 px-4 rounded-md hover:bg-emerald-700 transition h-[38px]">Create Account</button>
@@ -409,7 +428,20 @@
                 logFilterItemSelect.appendChild(itemOpt2);
             });
 
+            updateKPIs(allInventoryCache);
             renderActiveUnitsTable(allInventoryCache);
+        }
+
+        function updateKPIs(units) {
+            const total = units.length;
+            const warehouseCount = units.filter(u => u.status === 'warehouse').length;
+            const transitCount = units.filter(u => u.status === 'in_transit_to_client' || u.status === 'in_transit_to_warehouse').length;
+            const activeCount = units.filter(u => u.status === 'rental' || u.status === 'maintenance').length;
+
+            document.getElementById('kpi-total').textContent = total;
+            document.getElementById('kpi-warehouse').textContent = warehouseCount;
+            document.getElementById('kpi-transit').textContent = transitCount;
+            document.getElementById('kpi-active').textContent = activeCount;
         }
 
         function filterActiveUnits() {
@@ -422,6 +454,7 @@
                 return matchCat && matchUnit;
             });
 
+            updateKPIs(filtered);
             renderActiveUnitsTable(filtered);
         }
 
