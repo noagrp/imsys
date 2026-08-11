@@ -53,7 +53,7 @@
                     <select id="signupRole" class="w-full rounded-md border-slate-300 border p-2 text-sm">
                         <option value="admin">Admin</option>
                         <option value="manager">Manager</option>
-                        <option value="superadmin">Superadmin</option>
+                        <!-- Superadmin option added dynamically below only for Superadmins -->
                     </select>
                 </div>
                 <button type="submit" class="bg-emerald-600 text-white text-sm py-2 px-4 rounded-md hover:bg-emerald-700 transition h-[38px]">Create Account</button>
@@ -251,8 +251,16 @@
                 }
 
                 const userMgmtSection = document.getElementById('user-management-section');
+                const roleSelect = document.getElementById('signupRole');
+
                 if (role === 'manager' || role === 'superadmin') {
                     userMgmtSection.classList.remove('hidden');
+                    
+                    // Restrict dropdown: Managers can only select admin or manager. Superadmins get superadmin option too.
+                    roleSelect.innerHTML = '<option value="admin">Admin</option><option value="manager">Manager</option>';
+                    if (role === 'superadmin') {
+                        roleSelect.innerHTML += '<option value="superadmin">Superadmin</option>';
+                    }
                 } else {
                     userMgmtSection.classList.add('hidden');
                 }
