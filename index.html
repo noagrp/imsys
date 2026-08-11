@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        <!-- Inventory Amount & Distribution Breakdown -->
+        <!-- Inventory Amount & Distribution Breakdown (Moved to Top) -->
         <div class="mb-6 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
             <h2 class="text-xl font-semibold mb-4 text-slate-700">Inventory Amount & Distribution Breakdown</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -86,10 +86,10 @@
             </div>
         </div>
 
-        <!-- USER MANAGEMENT SECTION (Protected: Visible to Managers & Superadmins) -->
+        <!-- USER MANAGEMENT SECTION (Protected: Only visible to Managers & Superadmins) -->
         <div id="user-management-section" class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-6 hidden">
             <h2 class="text-xl font-semibold mb-4 text-slate-700">User Management (Manager & Superadmin Only)</h2>
-            <form id="signup-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-6">
+            <form id="signup-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 <div>
                     <label class="block text-xs font-medium text-slate-600">New User Email</label>
                     <input type="email" id="signupEmail" placeholder="user@inventory.com" class="w-full rounded-md border-slate-300 border p-2 text-sm" required>
@@ -107,23 +107,6 @@
                 </div>
                 <button type="submit" class="bg-emerald-600 text-white text-sm py-2 px-4 rounded-md hover:bg-emerald-700 transition h-[38px]">Create Account</button>
             </form>
-
-            <!-- Superadmin User List & Deletion Container -->
-            <div id="superadmin-user-list-container" class="hidden border-t pt-4">
-                <h3 class="font-semibold text-slate-700 mb-3 text-sm">System Users Directory (Superadmin View)</h3>
-                <div class="max-h-[200px] overflow-y-auto border rounded border-slate-200">
-                    <table class="min-w-full divide-y divide-slate-200 text-sm">
-                        <thead class="bg-slate-100 sticky top-0">
-                            <tr>
-                                <th class="p-2 text-left font-semibold text-slate-600">Email</th>
-                                <th class="p-2 text-left font-semibold text-slate-600">Role</th>
-                                <th class="p-2 text-right font-semibold text-slate-600">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body" class="divide-y divide-slate-200"></tbody>
-                    </table>
-                </div>
-            </div>
         </div>
 
         <!-- SETUP MANAGEMENT BAR (Categories & Warehouses) -->
@@ -144,8 +127,7 @@
             </div>
         </div>
 
-        <!-- ROW 1: Operations Cards (Register, Update, Live Overview) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <!-- Column 1: Register Inventory Unit -->
             <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
@@ -213,8 +195,8 @@
                 </form>
             </div>
 
-            <!-- Column 3: Live Units Overview (Optimized Layout with Inner Scroll) -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 flex flex-col h-[500px]">
+            <!-- Column 3: Live Units Overview -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-slate-700">3. Active Inventory Units</h2>
                 </div>
@@ -233,8 +215,7 @@
                         </select>
                     </div>
                 </div>
-                <!-- Scrollable Table Container to Handle Hundreds of Items Safely -->
-                <div class="overflow-y-auto flex-grow border rounded border-slate-200">
+                <div class="overflow-y-auto flex-grow max-h-[280px]">
                     <table class="min-w-full divide-y divide-slate-200 text-sm">
                         <thead class="bg-slate-100 sticky top-0">
                             <tr>
@@ -246,7 +227,7 @@
                         <tbody id="units-table-body" class="divide-y divide-slate-200"></tbody>
                     </table>
                 </div>
-                <div class="mt-4 flex gap-2 pt-2 border-t">
+                <div class="mt-4 flex gap-2">
                     <button onclick="loadAllData()" class="flex-grow bg-slate-200 text-slate-700 text-sm py-1.5 px-3 rounded hover:bg-slate-300 transition">Refresh Data</button>
                     <button onclick="exportInventoryToExcel()" class="bg-emerald-600 text-white text-sm py-1.5 px-3 rounded hover:bg-emerald-700 transition font-medium flex items-center gap-1">📊 Export Inventory</button>
                 </div>
@@ -254,8 +235,8 @@
 
         </div>
 
-        <!-- ROW 2: Section 4 - Status Logs & Date-Range Reporting (Optimized Layout with Inner Scroll) -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 flex flex-col h-[520px]">
+        <!-- Section 4: Audit Logs & Reporting -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-slate-700">4. Status Logs & Date-Range Reporting</h2>
                 <button onclick="exportLogsToExcel()" class="bg-emerald-600 text-white text-sm py-2 px-4 rounded hover:bg-emerald-700 transition flex items-center gap-1.5 font-medium">
@@ -281,10 +262,9 @@
                 <button onclick="loadAuditLogs()" class="bg-blue-600 text-white text-sm py-1.5 px-3 rounded hover:bg-blue-700">Filter Logs</button>
             </div>
 
-            <!-- Scrollable Logs Table Container -->
-            <div class="overflow-y-auto flex-grow border rounded border-slate-200">
+            <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-slate-200 text-sm">
-                    <thead class="bg-slate-100 sticky top-0">
+                    <thead class="bg-slate-100">
                         <tr>
                             <th onclick="sortAuditLogs('timestamp')" class="p-3 text-left font-semibold text-slate-600 cursor-pointer hover:bg-slate-200 select-none">Timestamp ↕</th>
                             <th onclick="sortAuditLogs('unitId')" class="p-3 text-left font-semibold text-slate-600 cursor-pointer hover:bg-slate-200 select-none">Unit ID ↕</th>
@@ -299,43 +279,11 @@
         </div>
     </div>
 
-    <!-- MODAL FOR MANAGER EDIT UNIT STATUS -->
-    <div id="edit-unit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full border border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Manager Privilege: Edit Unit Status</h3>
-            <form id="edit-unit-form" class="space-y-4">
-                <input type="hidden" id="editUnitId">
-                <div>
-                    <label class="block text-xs font-medium text-slate-600">Unit ID</label>
-                    <input type="text" id="editUnitIdDisplay" disabled class="w-full bg-slate-100 rounded border p-2 text-sm text-slate-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600">Override Status</label>
-                    <select id="editNewStatus" class="w-full rounded border-slate-300 border p-2 text-sm">
-                        <option value="warehouse">Warehouse</option>
-                        <option value="in_transit_to_client">In Transit (To Client)</option>
-                        <option value="rental">Rental (At Client Site)</option>
-                        <option value="in_transit_to_warehouse">In Transit (Return)</option>
-                        <option value="maintenance">Maintenance</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600">Location / Client Name</label>
-                    <input type="text" id="editLocationName" required class="w-full rounded border p-2 text-sm">
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeEditModal()" class="bg-slate-200 text-slate-700 px-4 py-2 rounded text-sm hover:bg-slate-300">Cancel</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">Save Override</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Firebase Script & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, getDocs, getDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBsdvefN3PyytR7x_7iC2UDJzlQQlICqrU",
@@ -358,14 +306,11 @@
         window.doc = doc;
         window.setDoc = setDoc;
         window.updateDoc = updateDoc;
-        window.deleteDoc = deleteDoc;
         window.addDoc = addDoc;
         window.serverTimestamp = serverTimestamp;
         window.query = query;
         window.orderBy = orderBy;
         window.collection = collection;
-
-        let currentUserRole = 'admin';
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -374,28 +319,23 @@
                 document.getElementById('user-email-display').textContent = user.email;
 
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
-                currentUserRole = 'admin';
+                let role = 'admin';
                 if (userDoc.exists()) {
-                    currentUserRole = userDoc.data().role || 'admin';
-                    document.getElementById('user-role-display').textContent = currentUserRole;
+                    role = userDoc.data().role || 'admin';
+                    document.getElementById('user-role-display').textContent = role;
                 } else {
-                    document.getElementById('user-role-display').textContent = currentUserRole;
+                    document.getElementById('user-role-display').textContent = role;
                 }
 
                 const userMgmtSection = document.getElementById('user-management-section');
-                const superadminListContainer = document.getElementById('superadmin-user-list-container');
                 const roleSelect = document.getElementById('signupRole');
 
-                if (currentUserRole === 'manager' || currentUserRole === 'superadmin') {
+                if (role === 'manager' || role === 'superadmin') {
                     userMgmtSection.classList.remove('hidden');
                     
                     roleSelect.innerHTML = '<option value="admin">Admin</option><option value="manager">Manager</option>';
-                    if (currentUserRole === 'superadmin') {
+                    if (role === 'superadmin') {
                         roleSelect.innerHTML += '<option value="superadmin">Superadmin</option>';
-                        superadminListContainer.classList.remove('hidden');
-                        loadSystemUsers();
-                    } else {
-                        superadminListContainer.classList.add('hidden');
                     }
                 } else {
                     userMgmtSection.classList.add('hidden');
@@ -428,7 +368,6 @@
                 await setDoc(doc(db, 'users', creds.user.uid), { email, role, createdAt: serverTimestamp() });
                 alert('New user account created successfully!');
                 document.getElementById('signup-form').reset();
-                if (currentUserRole === 'superadmin') loadSystemUsers();
             } catch (err) {
                 alert('User creation failed: ' + err.message);
             }
@@ -452,37 +391,6 @@
             await loadDropdowns();
             await loadInventoryUnits();
             await loadAuditLogs();
-        }
-
-        async function loadSystemUsers() {
-            if (!window.db) return;
-            const tbody = document.getElementById('users-table-body');
-            tbody.innerHTML = '';
-            const usersSnap = await window.getDocs(window.collection(window.db, 'users'));
-            usersSnap.forEach(docSnap => {
-                const data = docSnap.data();
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-2">${data.email || 'N/A'}</td>
-                    <td class="p-2"><span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-800 uppercase font-bold">${data.role || 'admin'}</span></td>
-                    <td class="p-2 text-right">
-                        ${docSnap.id !== window.auth.currentUser?.uid ? `<button onclick="deleteSystemUser('${docSnap.id}')" class="bg-red-50 text-red-600 border border-red-200 text-xs py-1 px-2.5 rounded hover:bg-red-100 font-semibold">Remove</button>` : '<span class="text-xs text-slate-400">Current User</span>'}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        async function deleteSystemUser(uid) {
-            if (confirm('Are you sure you want to remove this user profile from the database?')) {
-                try {
-                    await window.deleteDoc(window.doc(window.db, 'users', uid));
-                    alert('User record removed.');
-                    loadSystemUsers();
-                } catch (err) {
-                    alert('Failed to remove user record: ' + err.message);
-                }
-            }
         }
 
         async function loadDropdowns() {
@@ -540,12 +448,14 @@
                 const data = docSnap.data();
                 allInventoryCache.push({ id: docSnap.id, ...data });
 
+                // Populate update dropdown
                 const option = document.createElement('option');
                 option.value = docSnap.id;
                 option.textContent = `${docSnap.id} (${data.status})`;
                 updateSelect.appendChild(option);
             });
 
+            // Populate individual filter item dropdowns
             allInventoryCache.forEach(item => {
                 const itemOpt1 = document.createElement('option');
                 itemOpt1.value = item.id;
@@ -576,6 +486,7 @@
         }
 
         function updateInventoryBreakdowns(units) {
+            // Category breakdown
             const catContainer = document.getElementById('breakdown-category');
             catContainer.innerHTML = '';
             let catCounts = {};
@@ -591,6 +502,7 @@
                 }
             }
 
+            // Warehouse breakdown
             const whContainer = document.getElementById('breakdown-warehouse');
             whContainer.innerHTML = '';
             let whCounts = {};
@@ -610,6 +522,7 @@
                 }
             }
 
+            // Status breakdown
             const statusContainer = document.getElementById('breakdown-status');
             statusContainer.innerHTML = '';
             let statusCounts = { 'warehouse': 0, 'in_transit_to_client': 0, 'rental': 0, 'in_transit_to_warehouse': 0, 'maintenance': 0 };
@@ -653,55 +566,16 @@
         function renderActiveUnitsTable(units) {
             const tbody = document.getElementById('units-table-body');
             tbody.innerHTML = '';
-            const isManagerOrSuper = (currentUserRole === 'manager' || currentUserRole === 'superadmin');
-
             units.forEach((data) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="p-2 font-medium">${data.id}<br><small class="text-xs text-slate-400">${data.itemName || ''}</small></td>
-                    <td class="p-2">
-                        <span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800">${data.status}</span>
-                        ${isManagerOrSuper ? `<button onclick="openEditModal('${data.id}', '${data.status}', '${data.currentLocation?.name || ''}')" class="ml-2 text-xs text-blue-600 underline hover:text-blue-800 font-semibold">Edit</button>` : ''}
-                    </td>
+                    <td class="p-2"><span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800">${data.status}</span></td>
                     <td class="p-2">${data.currentLocation?.name || 'N/A'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
-
-        function openEditModal(unitId, currentStatus, currentLoc) {
-            document.getElementById('editUnitId').value = unitId;
-            document.getElementById('editUnitIdDisplay').value = unitId;
-            document.getElementById('editNewStatus').value = currentStatus;
-            document.getElementById('editLocationName').value = currentLoc;
-            document.getElementById('edit-unit-modal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('edit-unit-modal').classList.add('hidden');
-        }
-
-        document.getElementById('edit-unit-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const unitId = document.getElementById('editUnitId').value;
-            const newStatus = document.getElementById('editNewStatus').value;
-            const locationName = document.getElementById('editLocationName').value;
-
-            const unitRef = window.doc(window.db, 'inventoryUnits', unitId);
-            const locationData = { name: locationName, type: newStatus, gps: null };
-
-            await window.updateDoc(unitRef, { status: newStatus, currentLocation: locationData });
-            await window.addDoc(window.collection(window.db, 'statusLogs'), {
-                unitId,
-                newStatus,
-                toLocation: locationData,
-                timestamp: window.serverTimestamp()
-            });
-
-            alert('Unit status overridden successfully!');
-            closeEditModal();
-            loadAllData();
-        });
 
         async function loadAuditLogs() {
             if (!window.db) return;
@@ -771,6 +645,7 @@
             });
         }
 
+        // Excel Export for Inventory Units
         function exportInventoryToExcel() {
             if (allInventoryCache.length === 0) {
                 alert('No inventory items available to export.');
@@ -793,6 +668,7 @@
             XLSX.writeFile(workbook, `Active_Inventory_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
+        // Excel Export using SheetJS
         function exportLogsToExcel() {
             if (rawAuditLogsCache.length === 0) {
                 alert('No logs available matching current filter criteria to export.');
@@ -834,7 +710,7 @@
 
         document.getElementById('add-unit-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const unitId = document.getElementById('unitId')->value;
+            const unitId = document.getElementById('unitId').value;
             const itemName = document.getElementById('itemName').value;
             const categoryId = document.getElementById('unitCategory').value;
             const warehouseName = document.getElementById('unitWarehouse').value;
