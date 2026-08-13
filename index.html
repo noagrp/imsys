@@ -10,7 +10,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
 
-    <!-- AUTHENTICATION CONTAINER (Public Login Only) -->
+    <!-- AUTHENTICATION CONTAINER -->
     <div id="auth-container" class="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-sm border border-slate-200">
         <h1 class="text-2xl font-bold text-slate-900 mb-2">Inventory System Login</h1>
         <p class="text-sm text-slate-600 mb-6">Enter your organizational credentials to access the monitoring dashboard.</p>
@@ -58,25 +58,22 @@
             </div>
         </div>
 
-        <!-- Inventory Amount & Distribution Breakdown (Moved to Top) -->
+        <!-- Inventory Amount & Distribution Breakdown -->
         <div class="mb-6 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
             <h2 class="text-xl font-semibold mb-4 text-slate-700">Inventory Amount & Distribution Breakdown</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Total by Category -->
                 <div class="bg-slate-50 p-4 rounded-md border border-slate-200">
                     <h3 class="font-semibold text-slate-700 mb-2 text-sm">Total Items by Category</h3>
                     <div id="breakdown-category" class="space-y-2 text-sm text-slate-600 max-h-[180px] overflow-y-auto">
                         <p class="text-xs text-slate-400">Loading...</p>
                     </div>
                 </div>
-                <!-- Total by Warehouse -->
                 <div class="bg-slate-50 p-4 rounded-md border border-slate-200">
                     <h3 class="font-semibold text-slate-700 mb-2 text-sm">Total Items by Individual Warehouse</h3>
                     <div id="breakdown-warehouse" class="space-y-2 text-sm text-slate-600 max-h-[180px] overflow-y-auto">
                         <p class="text-xs text-slate-400">Loading...</p>
                     </div>
                 </div>
-                <!-- Total by Status & Overall Counts -->
                 <div class="bg-slate-50 p-4 rounded-md border border-slate-200">
                     <h3 class="font-semibold text-slate-700 mb-2 text-sm">Status Breakdown</h3>
                     <div id="breakdown-status" class="space-y-2 text-sm text-slate-600 max-h-[180px] overflow-y-auto">
@@ -86,12 +83,11 @@
             </div>
         </div>
 
-        <!-- ACTIVE INVENTORY UNITS (Full width single line, right above User Management, without number 3) -->
+        <!-- ACTIVE INVENTORY UNITS -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 flex flex-col mb-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-slate-700">Active Inventory Units</h2>
             </div>
-            <!-- Filtering Controls -->
             <div class="grid grid-cols-2 gap-2 mb-3">
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-slate-500">Filter Category</label>
@@ -124,7 +120,7 @@
             </div>
         </div>
 
-        <!-- USER MANAGEMENT SECTION (Protected: Only visible to Managers & Superadmins) -->
+        <!-- USER MANAGEMENT SECTION -->
         <div id="user-management-section" class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-6 hidden">
             <h2 class="text-xl font-semibold mb-4 text-slate-700">User Management (Manager & Superadmin Only)</h2>
             <form id="signup-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -147,7 +143,7 @@
             </form>
         </div>
 
-        <!-- SETUP MANAGEMENT BAR (Categories & Warehouses) -->
+        <!-- SETUP MANAGEMENT BAR -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                 <h3 class="font-semibold text-slate-700 mb-2">Manage Categories</h3>
@@ -166,7 +162,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             <!-- Column 1: Register Inventory Unit -->
             <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
                 <h2 class="text-xl font-semibold mb-4 text-slate-700">1. Register Inventory Unit</h2>
@@ -232,10 +227,9 @@
                     <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 px-4 rounded-md hover:bg-emerald-700 transition">Update Status & Log</button>
                 </form>
             </div>
-
         </div>
 
-        <!-- Section 4: Audit Logs & Reporting -->
+        <!-- Section 3: Audit Logs & Reporting -->
         <div class="mt-8 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-slate-700">3. Status Logs & Date-Range Reporting</h2>
@@ -279,7 +273,7 @@
         </div>
     </div>
 
-    <!-- Firebase Script & App Logic -->
+    <!-- Firebase Script & App Logic Combined -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -299,6 +293,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Expose Firebase tools to global window scope safely
         window.auth = auth;
         window.db = db;
         window.getDocs = getDocs;
@@ -312,6 +307,17 @@
         window.orderBy = orderBy;
         window.collection = collection;
 
+        let allInventoryCache = [];
+        let rawAuditLogsCache = [];
+        let categoriesMap = {};
+        let warehousesList = [];
+        let currentSortColumn = 'timestamp';
+        let currentSortDirection = 'desc';
+
+        window.logoutUser = async function() {
+            await signOut(auth);
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('auth-container').classList.add('hidden');
@@ -322,17 +328,14 @@
                 let role = 'admin';
                 if (userDoc.exists()) {
                     role = userDoc.data().role || 'admin';
-                    document.getElementById('user-role-display').textContent = role;
-                } else {
-                    document.getElementById('user-role-display').textContent = role;
                 }
+                document.getElementById('user-role-display').textContent = role;
 
                 const userMgmtSection = document.getElementById('user-management-section');
                 const roleSelect = document.getElementById('signupRole');
 
                 if (role === 'manager' || role === 'superadmin') {
                     userMgmtSection.classList.remove('hidden');
-                    
                     roleSelect.innerHTML = '<option value="admin">Admin</option><option value="manager">Manager</option>';
                     if (role === 'superadmin') {
                         roleSelect.innerHTML += '<option value="superadmin">Superadmin</option>';
@@ -372,29 +375,14 @@
                 alert('User creation failed: ' + err.message);
             }
         });
-    </script>
 
-    <!-- UI & Data Operations Script -->
-    <script>
-        let allInventoryCache = [];
-        let rawAuditLogsCache = [];
-        let categoriesMap = {};
-        let warehousesList = [];
-        let currentSortColumn = 'timestamp';
-        let currentSortDirection = 'desc';
-
-        async function logoutUser() {
-            await window.auth.signOut();
-        }
-
-        async function loadAllData() {
+        window.loadAllData = async function() {
             await loadDropdowns();
             await loadInventoryUnits();
             await loadAuditLogs();
         }
 
         async function loadDropdowns() {
-            if (!window.db) return;
             const catSelect = document.getElementById('unitCategory');
             const whSelect = document.getElementById('unitWarehouse');
             const filterCatSelect = document.getElementById('filterCategorySelect');
@@ -404,7 +392,7 @@
             filterCatSelect.innerHTML = '<option value="">All Categories</option>';
 
             categoriesMap = {};
-            const catSnap = await window.getDocs(window.collection(window.db, 'categories'));
+            const catSnap = await getDocs(collection(db, 'categories'));
             catSnap.forEach(d => {
                 categoriesMap[d.id] = d.data().name;
 
@@ -420,7 +408,7 @@
             });
 
             warehousesList = [];
-            const whSnap = await window.getDocs(window.collection(window.db, 'warehouses'));
+            const whSnap = await getDocs(collection(db, 'warehouses'));
             whSnap.forEach(d => {
                 const whName = d.data().name;
                 warehousesList.push(whName);
@@ -433,7 +421,6 @@
         }
 
         async function loadInventoryUnits() {
-            if (!window.db) return;
             const updateSelect = document.getElementById('updateUnitSelect');
             const filterItemSelect = document.getElementById('filterItemSelect');
             const logFilterItemSelect = document.getElementById('logFilterItemSelect');
@@ -443,7 +430,7 @@
             logFilterItemSelect.innerHTML = '<option value="">All Units / Items</option>';
 
             allInventoryCache = [];
-            const querySnapshot = await window.getDocs(window.collection(window.db, 'inventoryUnits'));
+            const querySnapshot = await getDocs(collection(db, 'inventoryUnits'));
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 allInventoryCache.push({ id: docSnap.id, ...data });
@@ -543,7 +530,7 @@
             }
         }
 
-        function filterActiveUnits() {
+        window.filterActiveUnits = function() {
             const selectedCat = document.getElementById('filterCategorySelect').value;
             const selectedUnitId = document.getElementById('filterItemSelect').value;
 
@@ -572,14 +559,13 @@
             });
         }
 
-        async function loadAuditLogs() {
-            if (!window.db) return;
+        window.loadAuditLogs = async function() {
             const startDateVal = document.getElementById('filterStartDate').value;
             const endDateVal = document.getElementById('filterEndDate').value;
             const selectedUnitId = document.getElementById('logFilterItemSelect').value;
 
-            const q = window.query(window.collection(window.db, 'statusLogs'), window.orderBy('timestamp', 'desc'));
-            const querySnapshot = await window.getDocs(q);
+            const q = query(collection(db, 'statusLogs'), orderBy('timestamp', 'desc'));
+            const querySnapshot = await getDocs(q);
             
             rawAuditLogsCache = [];
             querySnapshot.forEach((docSnap) => {
@@ -604,7 +590,7 @@
             sortAndRenderLogs();
         }
 
-        function sortAuditLogs(column) {
+        window.sortAuditLogs = function(column) {
             if (currentSortColumn === column) {
                 currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
             } else {
@@ -640,7 +626,7 @@
             });
         }
 
-        function exportInventoryToExcel() {
+        window.exportInventoryToExcel = function() {
             if (allInventoryCache.length === 0) {
                 alert('No inventory items available to export.');
                 return;
@@ -662,7 +648,7 @@
             XLSX.writeFile(workbook, `Active_Inventory_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
-        function exportLogsToExcel() {
+        window.exportLogsToExcel = function() {
             if (rawAuditLogsCache.length === 0) {
                 alert('No logs available matching current filter criteria to export.');
                 return;
@@ -686,7 +672,7 @@
         document.getElementById('add-category-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('categoryName').value;
-            await window.addDoc(window.collection(window.db, 'categories'), { name, createdAt: window.serverTimestamp() });
+            await addDoc(collection(db, 'categories'), { name, createdAt: serverTimestamp() });
             alert('Category added!');
             document.getElementById('categoryName').value = '';
             loadDropdowns();
@@ -695,7 +681,7 @@
         document.getElementById('add-warehouse-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('warehouseName').value;
-            await window.addDoc(window.collection(window.db, 'warehouses'), { name, createdAt: window.serverTimestamp() });
+            await addDoc(collection(db, 'warehouses'), { name, createdAt: serverTimestamp() });
             alert('Warehouse added!');
             document.getElementById('warehouseName').value = '';
             loadDropdowns();
@@ -708,20 +694,20 @@
             const categoryId = document.getElementById('unitCategory').value;
             const warehouseName = document.getElementById('unitWarehouse').value;
 
-            await window.setDoc(window.doc(window.db, 'inventoryUnits', unitId), {
+            await setDoc(doc(db, 'inventoryUnits', unitId), {
                 itemName,
                 categoryId,
                 status: 'warehouse',
                 currentLocation: { name: warehouseName, type: 'warehouse' },
-                createdAt: window.serverTimestamp()
+                createdAt: serverTimestamp()
             });
 
-            await window.addDoc(window.collection(window.db, 'statusLogs'), {
+            await addDoc(collection(db, 'statusLogs'), {
                 unitId,
                 previousStatus: 'None',
                 newStatus: 'warehouse',
                 toLocation: { name: warehouseName },
-                timestamp: window.serverTimestamp()
+                timestamp: serverTimestamp()
             });
 
             alert('Unit registered successfully!');
@@ -739,19 +725,23 @@
 
             if (!unitId) return alert('Please select a unit.');
 
-            const unitRef = window.doc(window.db, 'inventoryUnits', unitId);
+            const unitRef = doc(db, 'inventoryUnits', unitId);
+            const unitSnap = await getDoc(unitRef);
+            const previousStatus = unitSnap.exists() ? (unitSnap.data().status || 'Unknown') : 'Unknown';
+
             const locationData = {
                 name: newLocationName,
                 type: newStatus,
                 gps: (lat && lng) ? { lat: parseFloat(lat), lng: parseFloat(lng) } : null
             };
 
-            await window.updateDoc(unitRef, { status: newStatus, currentLocation: locationData });
-            await window.addDoc(window.collection(window.db, 'statusLogs'), {
+            await updateDoc(unitRef, { status: newStatus, currentLocation: locationData });
+            await addDoc(collection(db, 'statusLogs'), {
                 unitId,
+                previousStatus,
                 newStatus,
                 toLocation: locationData,
-                timestamp: window.serverTimestamp()
+                timestamp: serverTimestamp()
             });
 
             alert('Status updated successfully!');
