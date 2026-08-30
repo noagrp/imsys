@@ -26,6 +26,22 @@
             </div>
             <button type="submit" class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition">Sign In</button>
         </form>
+
+        <div class="flex items-center gap-3 my-5">
+            <div class="h-px bg-slate-200 flex-1"></div>
+            <span class="text-xs uppercase tracking-wide text-slate-400">or</span>
+            <div class="h-px bg-slate-200 flex-1"></div>
+        </div>
+
+        <button id="google-login-button" type="button" class="w-full bg-white text-slate-700 font-medium py-2 px-4 rounded-md border border-slate-300 hover:bg-slate-50 transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.38Z"/>
+                <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.62-2.39l-3.24-2.51c-.9.6-2.05.96-3.38.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.59A10 10 0 0 0 12 22Z"/>
+                <path fill="#FBBC05" d="M6.39 13.93A6.02 6.02 0 0 1 6.08 12c0-.67.12-1.32.31-1.93V7.48H3.04A10 10 0 0 0 2 12c0 1.61.38 3.14 1.04 4.52l3.35-2.59Z"/>
+                <path fill="#EA4335" d="M12 5.94c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.96 5.48l3.35 2.59C7.18 7.7 9.39 5.94 12 5.94Z"/>
+            </svg>
+            Continue with Google
+        </button>
     </div>
 
     <!-- MAIN DASHBOARD CONTAINER -->
@@ -276,7 +292,7 @@
     <!-- Firebase Script & App Logic Combined -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -292,6 +308,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
 
         // Expose Firebase tools to global window scope safely
         window.auth = auth;
@@ -357,6 +375,16 @@
                 await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
             } catch (err) {
                 alert('Login failed: ' + err.message);
+            }
+        });
+
+        document.getElementById('google-login-button').addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (err) {
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    alert('Google login failed: ' + err.message);
+                }
             }
         });
 
