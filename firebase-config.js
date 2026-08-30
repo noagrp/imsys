@@ -3,13 +3,13 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 export const firebaseConfig = {
-    apiKey: "AIzaSyBb2BrGjHIzOnds-f-LtmsW0WocOh9SxEk",
-    authDomain: "imssystem-38c4f.firebaseapp.com",
-    projectId: "imssystem-38c4f",
-    storageBucket: "imssystem-38c4f.firebasestorage.app",
-    messagingSenderId: "1002447791463",
-    appId: "1:1002447791463:web:e8f353def694c7d9013bc2",
-    measurementId: "G-9Q8DYZH4LM"
+    apiKey: "AIzaSyBsdvefN3PyytR7x_7iC2UDJzlQQlICqrU",
+    authDomain: "intentory-management-b1128.firebaseapp.com",
+    projectId: "intentory-management-b1128",
+    storageBucket: "intentory-management-b1128.firebasestorage.app",
+    messagingSenderId: "219598370646",
+    appId: "1:219598370646:web:d0183ac06d73b8b1e148f7",
+    measurementId: "G-K6CZZ36M42"
 };
 
 const app = initializeApp(firebaseConfig);
